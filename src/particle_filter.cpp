@@ -24,7 +24,35 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	//   x, y, theta and their uncertainties from GPS) and all weights to 1. 
 	// Add random Gaussian noise to each particle.
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
-
+	default_random_engine gen;
+	num_particles = 700;
+	double i_weight = 1.0/num_particles;
+	
+	//standard deviations
+	double std_x = std[0];
+	double std_y = std[1];
+	double std_theta = std[2];
+	//generate distribution
+	normal_distribution<double> dist_x(x, std_x);
+	normal_distribution<double> dist_y(y, std_y);
+	normal_distribution<double> dist_theta(theta, std_theta);
+	
+	//sample from the distribution
+	for(int i = 0; i < num_particles; ++i){
+		Particle ptc;
+		ptc.id = i+1;
+		//sample values using generator
+		ptc.x = dist_x(gen);
+		ptc.y = dist_y(gen);
+		ptc.theta = dist_theta(gen);
+		//add common weight
+		ptc.weight = i_weight;
+		//add to particles vector
+		particles.push_back(ptc);
+	}
+	
+	//set initialized flag to true
+	is_initialized = true;
 }
 
 void ParticleFilter::prediction(double delta_t, double std_pos[], double velocity, double yaw_rate) {
@@ -32,7 +60,26 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	// NOTE: When adding noise you may find std::normal_distribution and std::default_random_engine useful.
 	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
-
+	
+	//common values
+	double vel_yaw_ratio = yaw_rate!=0 ? ((double)velocity/yaw_rate) : -1.0;
+	//predict
+	for(int i=0; i < num_particles; ++i){
+		double cos_theta = cos(particles[i].theta);
+		double sin_theta = sin(particles[i].theta);
+		double d_x, d_y;
+		
+		if(vel_yaw_ratio > -0.5){
+			d_x = vel_yaw_ratio * ( sin(particles[i].theta + yaw_rate*delta_t) - sin_theta );
+			d_y = vel_yaw_ratio * ( -cos(particles[i].theta + yaw_rate*delta_t) + cos_theta );
+		}else{
+			d_x = velocity * cos_theta * delta_t;
+			d_y = velocity * sin_theta * delta_t;
+		}
+		particles[i].theta += yaw_rate * delta_t + std_pos[2];
+		particles[i].x += d_x + std_pos[0];
+		particles[i].y += d_y + std_pos[1];
+	}
 }
 
 void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::vector<LandmarkObs>& observations) {
@@ -40,7 +87,12 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 	//   observed measurement to this particular landmark.
 	// NOTE: this method will NOT be called by the grading code. But you will probably find it useful to 
 	//   implement this method and use it as a helper during the updateWeights phase.
-
+	//create local copy of observations, so that we can pop used observations
+	std::vector<double> obs;
+	for(int i=0; i < observations.size(); i++){
+		obs.push_back(observations[i]);
+	}
+	
 }
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
@@ -55,13 +107,35 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   and the following is a good resource for the actual equation to implement (look at equation 
 	//   3.33
 	//   http://planning.cs.uiuc.edu/node99.html
+	
 }
 
 void ParticleFilter::resample() {
 	// TODO: Resample particles with replacement with probability proportional to their weight. 
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
-
+	double w_max = *std::max_element(weights.begin(), weights.end());
+	int index = 0;
+	double beta = 0;
+	std::vector<Particle> p_smp;
+	for(int i=0; i < num_particles; i++){
+		beta += w_max;
+		while(true){
+			if(index >= num_particles)
+				index = 0;
+			if(weights[index] < beta){
+				beta -= weights[index];
+				index++;
+			}else{
+				p_smp.push_back(particles[index]);
+				break;
+			}
+		}
+	}
+	particles = p_smp;
+	// update weight vector
+	for(int i=0; i< num_particles; i++)
+		weights[i] = particles[i].weight;
 }
 
 Particle ParticleFilter::SetAssociations(Particle& particle, const std::vector<int>& associations, 
