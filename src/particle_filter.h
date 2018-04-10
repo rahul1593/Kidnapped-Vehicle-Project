@@ -117,6 +117,21 @@ public:
 	}
 };
 
+/* Transform the points from car's coordinate system to map's coordinate system.
+ * @params
+ *      p: particle representing the car position
+ *      observation: observation in car's coordinate system
+ *      map_observation: output observation transformed to map's coordniate system
+ */
+void transform2MapCoordinates(struct Particle p, std::vector<LandmarkObs> observations, std::vector<LandmarkObs> &map_observations);
 
+/*
+ * Find Observations which are in sensor range.
+ * @params
+ *      p: particle depicting car's position
+ *      map_observations: observations in map coordinate system
+ *      observations_in_range: output observations vector for in range observations
+ */
+void observationsInRange(double sensor_range, Particle p, Map map_observations, std::vector<LandmarkObs> &observations_in_range);
 
 #endif /* PARTICLE_FILTER_H_ */
