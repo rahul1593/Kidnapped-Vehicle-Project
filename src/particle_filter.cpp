@@ -25,7 +25,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	// Add random Gaussian noise to each particle.
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
 	default_random_engine gen;
-	num_particles = 100;
+	num_particles = 50;
 	const double i_weight = 1.0;
 	
 	//standard deviations
@@ -138,7 +138,7 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 	//   implement this method and use it as a helper during the updateWeights phase.
 	
 	for(int i=0; i < observations.size(); i++){
-        double min_dif = 10000.0;
+        double min_dif = 10000000.0;
         int min_id = -1;
 		for(int j=0; j < predicted.size(); j++){
             const double cdif = dist(predicted[j].x, predicted[j].y, observations[i].x, observations[i].y);
@@ -167,8 +167,8 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	// values for calculating weights
     const double dx = 0.5/(std_landmark[0] * std_landmark[0]);
     const double dy = 0.5/(std_landmark[1] * std_landmark[1]);
-    const double norm_f = sqrt(2 * M_PI * std_landmark[0] * std_landmark[1]);
-    
+    const double norm_f = sqrt(2.0 * M_PI * std_landmark[0] * std_landmark[1]);
+    //std::cout << weights[0] << std::endl;
     // update weights for all particles
     for(int i=0; i < num_particles; i++){
         std::vector<LandmarkObs> map_observations;
@@ -185,11 +185,13 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
             const int id = map_observations[j].id;
             const double dfx = map_observations[j].x - observations_in_range[id].x;
             const double dfy = map_observations[j].y - observations_in_range[id].y;
+            //std::cout << dfx << " " << dfy << std::endl;
             n_w *= (exp(-( (dfx*dfx*dx) + (dfy*dfy*dy) )) / norm_f);
         }
         particles[i].weight = n_w;
         weights[i] = n_w;
     }
+    //std::cout << weights[0] << std::endl;
 }
 
 void ParticleFilter::resample() {
