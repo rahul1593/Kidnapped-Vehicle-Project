@@ -25,7 +25,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	// Add random Gaussian noise to each particle.
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
 	default_random_engine gen;
-	num_particles = 50;
+	num_particles = 30;
 	const double i_weight = 1.0;
 	
 	//standard deviations
@@ -203,7 +203,7 @@ void ParticleFilter::resample() {
 	// TODO: Resample particles with replacement with probability proportional to their weight. 
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
-	double w_max = *std::max_element(weights.begin(), weights.end());
+	/*double w_max = *std::max_element(weights.begin(), weights.end());
 	//std::cout << "max:" << w_max << std::endl;
 	int index = 0;
 	double beta = 0;
@@ -221,6 +221,15 @@ void ParticleFilter::resample() {
 				break;
 			}
 		}
+	}*/
+	default_random_engine gen;
+	std::discrete_distribution<> wt(weights.begin(), weights.end());
+	std::vector<Particle> p_smp;
+	int index = 0;
+	for(int i=0; i < num_particles; ++i){
+		index = wt(gen);
+		particles[index].weight = 1.0;
+		p_smp.push_back(particles[index]);
 	}
 	particles = p_smp;
 }
