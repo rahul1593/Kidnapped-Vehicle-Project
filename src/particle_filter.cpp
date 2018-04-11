@@ -113,7 +113,7 @@ void transform2MapCoordinates(struct Particle p, std::vector<LandmarkObs> observ
 }
 
 /*
- * Find Observations which are in range
+ * Find Observations which are in sensor range
  */
 void observationsInRange(double sensor_range, struct Particle p, Map map_landmarks, std::vector<LandmarkObs> &observations_in_range){
     
@@ -198,10 +198,13 @@ void ParticleFilter::resample() {
 	// TODO: Resample particles with replacement with probability proportional to their weight. 
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
+    
+    // new particles list
+	std::vector<Particle> p_smp;
+    /*// Sampling wheel method
 	double w_max = *std::max_element(weights.begin(), weights.end());
 	int index = 0;
 	double beta = 0;
-	std::vector<Particle> p_smp;
 	for(int i=0; i < num_particles; i++){
 		beta += w_max;
 		while(true){
@@ -215,7 +218,17 @@ void ParticleFilter::resample() {
 				break;
 			}
 		}
-	}
+	}*/
+    // discrete_distribution method
+    default_random_engine gen;
+	std::discrete_distribution<> wt(weights.begin(), weights.end());
+    
+	int index = 0;
+	for(int i=0; i < num_particles; ++i){
+		index = wt(gen);
+		//particles[index].weight = 1.0;
+		p_smp.push_back(particles[index]);
+    }
 	particles = p_smp;
 }
 
