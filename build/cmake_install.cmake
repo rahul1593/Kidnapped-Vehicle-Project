@@ -1,4 +1,4 @@
-# Install script for directory: /mnt/c/Users/rahul.bhartari/Documents/git/Kidnapped-Vehicle-Project
+# Install script for directory: /home/geek/dev/git/Kidnapped-Vehicle-Project
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/mnt/c/Users/rahul.bhartari/Documents/git/Kidnapped-Vehicle-Project/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/geek/dev/git/Kidnapped-Vehicle-Project/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

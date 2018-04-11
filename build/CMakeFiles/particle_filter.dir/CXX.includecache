@@ -1,4 +1,4 @@
-#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
 
 #IncludeRegexScan: ^.*$
 
@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/mnt/c/Users/rahul.bhartari/Documents/git/Kidnapped-Vehicle-Project/src/helper_functions.h
+/home/geek/dev/git/Kidnapped-Vehicle-Project/src/helper_functions.h
 sstream
 -
 fstream
@@ -16,9 +16,9 @@ math.h
 vector
 -
 map.h
-/mnt/c/Users/rahul.bhartari/Documents/git/Kidnapped-Vehicle-Project/src/map.h
+/home/geek/dev/git/Kidnapped-Vehicle-Project/src/map.h
 
-/mnt/c/Users/rahul.bhartari/Documents/git/Kidnapped-Vehicle-Project/src/json.hpp
+/home/geek/dev/git/Kidnapped-Vehicle-Project/src/json.hpp
 algorithm
 -
 array
@@ -74,21 +74,21 @@ utility
 vector
 -
 
-/mnt/c/Users/rahul.bhartari/Documents/git/Kidnapped-Vehicle-Project/src/main.cpp
+/home/geek/dev/git/Kidnapped-Vehicle-Project/src/main.cpp
 uWS/uWS.h
 -
 iostream
 -
 json.hpp
-/mnt/c/Users/rahul.bhartari/Documents/git/Kidnapped-Vehicle-Project/src/json.hpp
+/home/geek/dev/git/Kidnapped-Vehicle-Project/src/json.hpp
 math.h
 -
 particle_filter.h
-/mnt/c/Users/rahul.bhartari/Documents/git/Kidnapped-Vehicle-Project/src/particle_filter.h
+/home/geek/dev/git/Kidnapped-Vehicle-Project/src/particle_filter.h
 
-/mnt/c/Users/rahul.bhartari/Documents/git/Kidnapped-Vehicle-Project/src/map.h
+/home/geek/dev/git/Kidnapped-Vehicle-Project/src/map.h
 
-/mnt/c/Users/rahul.bhartari/Documents/git/Kidnapped-Vehicle-Project/src/particle_filter.cpp
+/home/geek/dev/git/Kidnapped-Vehicle-Project/src/particle_filter.cpp
 random
 -
 algorithm
@@ -108,9 +108,9 @@ string
 iterator
 -
 particle_filter.h
-/mnt/c/Users/rahul.bhartari/Documents/git/Kidnapped-Vehicle-Project/src/particle_filter.h
+/home/geek/dev/git/Kidnapped-Vehicle-Project/src/particle_filter.h
 
-/mnt/c/Users/rahul.bhartari/Documents/git/Kidnapped-Vehicle-Project/src/particle_filter.h
+/home/geek/dev/git/Kidnapped-Vehicle-Project/src/particle_filter.h
 helper_functions.h
-/mnt/c/Users/rahul.bhartari/Documents/git/Kidnapped-Vehicle-Project/src/helper_functions.h
+/home/geek/dev/git/Kidnapped-Vehicle-Project/src/helper_functions.h
 

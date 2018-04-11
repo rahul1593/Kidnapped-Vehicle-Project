@@ -25,7 +25,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	// Add random Gaussian noise to each particle.
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
 	default_random_engine gen;
-	num_particles = 30;
+	num_particles = 50;
 	const double i_weight = 1.0;
 	
 	//standard deviations
@@ -38,22 +38,20 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	normal_distribution<double> dist_theta(theta, std_theta);
 	
 	//sample from the distribution
-	for(int i = 0; i < num_particles; ++i){
+	for(int i = 0; i < num_particles; i++){
 		Particle ptc;
 		ptc.id = i;
 		//sample values using generator
 		ptc.x = dist_x(gen);
 		ptc.y = dist_y(gen);
 		ptc.theta = dist_theta(gen);
-		//std::cout << "init_theta:" << ptc.theta << std::endl;
 		//add common weight
 		ptc.weight = i_weight;
 		//add particle and weight to respective vector
-		this->particles.push_back(ptc);
-        this->weights.push_back(i_weight);
+		particles.push_back(ptc);
+        weights.push_back(i_weight);
 	}
-	//std::cout << particles[0].theta << "p1" << std::endl;
-	//std::cout << particles[1].theta << "p2" << std::endl;
+	
 	//set initialized flag to true
 	is_initialized = true;
 }
@@ -65,14 +63,14 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
 	
 	//common values
-    const bool turning = (fabs(yaw_rate) != 0.0001);
+    const bool turning = (fabs(yaw_rate) > 0.0001);
 	const double vel_yaw_ratio =  (turning ? ((double)velocity/yaw_rate) : 0.0);
     
     default_random_engine gen;
     normal_distribution<double> noise_x(0.0, std_pos[0]);
     normal_distribution<double> noise_y(0.0, std_pos[1]);
     normal_distribution<double> noise_theta(0.0, std_pos[2]);
-	
+    
     //predict
 	for(int i=0; i < num_particles; ++i){
 		double d_x, d_y;
@@ -82,8 +80,6 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		const double n_y = noise_y(gen);
 		const double n_t = noise_theta(gen);
         
-		//std::cout << "theta:" << particles[i].theta << std::endl;
-		
 		if(turning){//if yaw rate is not zero
 			d_x = vel_yaw_ratio * ( sin(particles[i].theta + yaw_rate*delta_t) - sin_theta );
 			d_y = vel_yaw_ratio * ( -cos(particles[i].theta + yaw_rate*delta_t) + cos_theta );
@@ -142,7 +138,7 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 	//   implement this method and use it as a helper during the updateWeights phase.
 	
 	for(int i=0; i < observations.size(); i++){
-        double min_dif = 100000000.0;
+        double min_dif = 10000000.0;
         int min_id = -1;
 		for(int j=0; j < predicted.size(); j++){
             const double cdif = dist(predicted[j].x, predicted[j].y, observations[i].x, observations[i].y);
@@ -171,7 +167,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	// values for calculating weights
     const double dx = 0.5/(std_landmark[0] * std_landmark[0]);
     const double dy = 0.5/(std_landmark[1] * std_landmark[1]);
-    const double norm_f = 2.0 * M_PI * std_landmark[0] * std_landmark[1];
+    const double norm_f = sqrt(2.0 * M_PI * std_landmark[0] * std_landmark[1]);
     //std::cout << weights[0] << std::endl;
     // update weights for all particles
     for(int i=0; i < num_particles; i++){
@@ -192,7 +188,6 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
             //std::cout << dfx << " " << dfy << std::endl;
             n_w *= (exp(-( (dfx*dfx*dx) + (dfy*dfy*dy) )) / norm_f);
         }
-		//std::cout << "weight:" << n_w << std::endl;
         particles[i].weight = n_w;
         weights[i] = n_w;
     }
@@ -203,12 +198,11 @@ void ParticleFilter::resample() {
 	// TODO: Resample particles with replacement with probability proportional to their weight. 
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
-	/*double w_max = *std::max_element(weights.begin(), weights.end());
-	//std::cout << "max:" << w_max << std::endl;
+	double w_max = *std::max_element(weights.begin(), weights.end());
 	int index = 0;
 	double beta = 0;
 	std::vector<Particle> p_smp;
-	for(int i=0; i < num_particles; ++i){
+	for(int i=0; i < num_particles; i++){
 		beta += w_max;
 		while(true){
 			if(index >= num_particles)
@@ -221,15 +215,6 @@ void ParticleFilter::resample() {
 				break;
 			}
 		}
-	}*/
-	default_random_engine gen;
-	std::discrete_distribution<> wt(weights.begin(), weights.end());
-	std::vector<Particle> p_smp;
-	int index = 0;
-	for(int i=0; i < num_particles; ++i){
-		index = wt(gen);
-		particles[index].weight = 1.0;
-		p_smp.push_back(particles[index]);
 	}
 	particles = p_smp;
 }
